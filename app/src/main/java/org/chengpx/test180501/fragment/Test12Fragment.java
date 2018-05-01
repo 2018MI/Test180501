@@ -8,6 +8,8 @@ import android.view.ViewGroup;
 import org.chengpx.mylib.BaseFragment;
 
 /**
+ * 第12题编码实现车辆违章查看功能
+ * <p>
  * create at 2018/5/1 17:06 by chengpx
  */
 public class Test12Fragment extends BaseFragment {
