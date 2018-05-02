@@ -41,6 +41,8 @@ public class MyTraffic46Fragment extends BaseFragment {
     private android.widget.SeekBar seekbar;
     private TextView tvLightSeekbarNum;
     private Timer timer;
+    private boolean isVisible;
+    private boolean isViewCreated;
 
     @Override
     protected void initListener() {
@@ -63,12 +65,16 @@ public class MyTraffic46Fragment extends BaseFragment {
     protected void main() {
 
     }
-
     @Override
     protected void initData() {
-
         timer = new Timer();
         timer.schedule(new MyTimerTask(new Callback(Map.class)), 0, 3000);
+    }
+
+    @Override
+    protected void onDims() {
+        timer.cancel();
+        timer = null;
     }
 
     public class Callback extends HttpUtils.Callback<Map> {
@@ -101,7 +107,7 @@ public class MyTraffic46Fragment extends BaseFragment {
                     MediaController mediaController = new MediaController(getContext());
                     vvPm25.setMediaController(mediaController);
                     vvPm25.setVideoURI(Uri.parse("android.resource://" + getActivity().getPackageName() + "//" + R.raw.test));
-                 //   vvPm25.start();
+                    //   vvPm25.start();
                 } else {
                     tvPm25Des.setText("适合出行");
                 }
@@ -150,11 +156,6 @@ public class MyTraffic46Fragment extends BaseFragment {
         }
     }
 
-    @Override
-    protected void onDims() {
-        timer.cancel();
-        timer = null;
-    }
 
     private void initView() {
         tvPm25 = inflate.findViewById(R.id.tv_pm25);
@@ -167,5 +168,6 @@ public class MyTraffic46Fragment extends BaseFragment {
         seekbar = inflate.findViewById(R.id.seekbar);
         tvLightSeekbarNum = inflate.findViewById(R.id.tv_light_seekbar_num);
         seekbar.setMax(5000);
+
     }
 }

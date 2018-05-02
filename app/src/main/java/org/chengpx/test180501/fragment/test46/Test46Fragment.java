@@ -5,7 +5,9 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -43,14 +45,16 @@ public class Test46Fragment extends BaseFragment implements RadioGroup.OnChecked
     @Override
     protected View initView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_test46, container, false);
-        test46_noscrollviewpager_content = (NoScrollViewPager) view.findViewById(R.id.test46_noscrollviewpager_content);
+        test46_noscrollviewpager_content = view.findViewById(R.id.test46_noscrollviewpager_content);
         test46_radiogroup_indicators = view.findViewById(R.id.test46_radiogroup_indicators);
         test46_noscrollviewpager_content.setOffscreenPageLimit(0);
         return view;
     }
 
+
     @Override
     protected void onDie() {
+
     }
 
     @Override
@@ -70,6 +74,7 @@ public class Test46Fragment extends BaseFragment implements RadioGroup.OnChecked
             radioButton.setGravity(Gravity.CENTER);
             test46_radiogroup_indicators.addView(radioButton);
         }
+        test46_noscrollviewpager_content.setOffscreenPageLimit(0);
     }
 
     @Override

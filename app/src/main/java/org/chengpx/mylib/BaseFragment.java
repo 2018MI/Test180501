@@ -16,6 +16,7 @@ public abstract class BaseFragment extends Fragment {
 
     protected FragmentActivity mFragmentActivity;
 
+
     @Nullable
     @Override
     public final View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -40,9 +41,10 @@ public abstract class BaseFragment extends Fragment {
     @Override
     public final void onResume() {
         super.onResume();
-        initData();
+       initData();
         main();
     }
+
 
     protected abstract void main();
 
