@@ -32,11 +32,13 @@ public class Test4Fragment extends BaseFragment implements View.OnClickListener 
 
     @Override
     protected void initListener() {
+        tvVideo.setOnClickListener(this);
+        tvPic.setOnClickListener(this);
     }
 
     @Override
     protected View initView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        inflate = inflater.inflate(R.layout.fragment_test4, null);
+        inflate = inflater.inflate(R.layout.fragment_test4, container, false);
         initView();//初始化控件
         return inflate;
     }
@@ -54,13 +56,11 @@ public class Test4Fragment extends BaseFragment implements View.OnClickListener 
     @Override
     protected void initData() {
         fragments = new ArrayList<>();
-        fm = getActivity().getSupportFragmentManager();
+        fm = getChildFragmentManager();//todo fragment在嵌套fragment必须使用getChildFragment管理fragment
         initFragment();
         MyAdapter adapter = new MyAdapter(fm);
         vp.setAdapter(adapter);
         tvVideo.setEnabled(false);
-        tvVideo.setOnClickListener(this);
-        tvPic.setOnClickListener(this);
     }
 
     private void initFragment() {
