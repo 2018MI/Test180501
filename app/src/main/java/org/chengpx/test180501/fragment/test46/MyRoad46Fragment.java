@@ -25,7 +25,7 @@ import java.util.TimerTask;
  */
 public class MyRoad46Fragment extends BaseFragment {
 
-    private static String sTag = "org.chengpx.test180501.fragment.test46.MyTraffic46Fragment";
+    private static String sTag = "org.chengpx.test180501.fragment.test46.MyRoad46Fragment";
 
     private ListView test46_lv_trafficinfoList;
     private Integer[] mTrafficLightIdArr = {
@@ -192,12 +192,11 @@ public class MyRoad46Fragment extends BaseFragment {
             reqValues.put("TrafficLightId", mTrafficLightIdArr[mTrafficLightIdGetTrafficLightNowStatusReqIndex]);
             RequestPool.getInstance().add("http://192.168.2.19:9090/transportservice/type/jason/action/GetTrafficLightNowStatus.do",
                     reqValues, mGetTrafficLightNowStatusCallBack);
-
             reqValues.clear();
-            /*mRoadIdReqIndex = 0;
+            mRoadIdReqIndex = 0;
             reqValues.put("RoadId", mRoadIdArr[mRoadIdReqIndex]);
             RequestPool.getInstance().add("http://192.168.2.19:9090/transportservice/type/jason/action/GetRoadStatus.do",
-                    reqValues, mGetTrafficLightNowStatusCallBack);*/
+                    reqValues, mGetRoadStatusCallBack);
         }
 
     }

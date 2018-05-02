@@ -101,7 +101,7 @@ public class MyTraffic46Fragment extends BaseFragment {
                     MediaController mediaController = new MediaController(getContext());
                     vvPm25.setMediaController(mediaController);
                     vvPm25.setVideoURI(Uri.parse("android.resource://" + getActivity().getPackageName() + "//" + R.raw.test));
-                    vvPm25.start();
+                    // vvPm25.start();
                 } else {
                     tvPm25Des.setText("适合出行");
                 }

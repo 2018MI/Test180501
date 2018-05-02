@@ -5,7 +5,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.FragmentStatePagerAdapter;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -45,6 +45,7 @@ public class Test46Fragment extends BaseFragment implements RadioGroup.OnChecked
         View view = inflater.inflate(R.layout.fragment_test46, container, false);
         test46_noscrollviewpager_content = (NoScrollViewPager) view.findViewById(R.id.test46_noscrollviewpager_content);
         test46_radiogroup_indicators = view.findViewById(R.id.test46_radiogroup_indicators);
+        test46_noscrollviewpager_content.setOffscreenPageLimit(0);
         return view;
     }
 
@@ -80,7 +81,7 @@ public class Test46Fragment extends BaseFragment implements RadioGroup.OnChecked
         test46_noscrollviewpager_content.setCurrentItem(group.indexOfChild(group.findViewById(checkedId)), false);
     }
 
-    private class MyPagerAdapter extends FragmentPagerAdapter {
+    private class MyPagerAdapter extends FragmentStatePagerAdapter {
 
         MyPagerAdapter(FragmentManager fm) {
             super(fm);
