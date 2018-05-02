@@ -10,12 +10,21 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import org.chengpx.mylib.AppException;
 import org.chengpx.mylib.BaseFragment;
+import org.chengpx.mylib.common.DataUtils;
 import org.chengpx.mylib.http.HttpUtils;
 import org.chengpx.mylib.http.RequestPool;
 import org.chengpx.test180501.R;
 
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * 第13题编码实现路况查询模块
@@ -23,7 +32,6 @@ import java.util.Map;
  * create at 2018/5/1 17:06 by chengpx
  */
 public class Test13Fragment extends BaseFragment implements View.OnClickListener {
-
 
     private TextView test13_tv_hcksltop;
     private TextView test13_tv_hckslleft;
@@ -44,6 +52,9 @@ public class Test13Fragment extends BaseFragment implements View.OnClickListener
             R.drawable.shape_rectangle_status3, R.drawable.shape_rectangle_status4,
             R.drawable.shape_rectangle_status5
     };
+    private Integer[] mRoadStatusArr = {
+            1, 2, 3, 4, 5
+    };
     private String[] mRoadStatusDescArr = {
             "畅通", "缓行", "一般拥堵", "中度拥堵", "严重拥堵"
     };
@@ -53,13 +64,17 @@ public class Test13Fragment extends BaseFragment implements View.OnClickListener
     private String[] mSenseNameArr = {
             "temperature", "humidity", "pm2.5"
     };
-    private TextView[] mHckslTvArr = {
-            test13_tv_hcksltop, test13_tv_hckslleft, test13_tv_hckslbottom
-    };
+    private View[][] mRoadUiViewArr;
     private String[] mSenseUnitArr = {
             "℃", "%", "ug/m3"
     };
+    private Integer[] mRoadIdArr = {
+            1, 2, 3, 4, 5, 6, 7
+    };
     private Map<String, Double> mSenseDataMap;
+    private SenseAdapter mSenseAdapter;
+    private Timer mTimer;
+    private int mRoadIdReqIndex;
 
     @Override
     protected void initListener() {
@@ -83,45 +98,116 @@ public class Test13Fragment extends BaseFragment implements View.OnClickListener
         test13_btn_flush = (Button) view.findViewById(R.id.test13_btn_flush);
         test13_lv_senselist = (ListView) view.findViewById(R.id.test13_lv_senselist);
         test13_lv_roadstatusexmaple = (ListView) view.findViewById(R.id.test13_lv_roadstatusexmaple);
+        mRoadUiViewArr = new View[][]{
+                {test13_tv_xuexiaoroad}, {test13_tv_lenovoroad}, {test13_tv_hospitalroad}, {test13_tv_xinfuroad},
+                {test13_tv_hcksltop, test13_tv_hckslleft, test13_tv_hckslbottom}, {test13_tv_hcgsright}, {test13_tv_parking}
+        };
         return view;
     }
 
     @Override
     protected void onDie() {
         mTest13Fragment = null;
+        mRoadUiViewArr = null;
     }
 
     @Override
     protected void main() {
         test13_lv_roadstatusexmaple.setAdapter(new RoadstatusexmapleAdapter());
-
+        mSenseAdapter = new SenseAdapter();
+        test13_lv_senselist.setAdapter(mSenseAdapter);
     }
 
     @Override
     protected void initData() {
+        Date date = Calendar.getInstance(Locale.CHINA).getTime();
+        test13_tv_date.setText(String.format(Locale.CHINA, "%tY-%tm-%td\n%tA", date, date, date, date));
+        mSenseDataMap = new HashMap<>();
         RequestPool.getInstance().add("http://192.168.2.19:9090/transportservice/type/jason/action/GetAllSense.do", null,
                 new GetAllSenseCallBack(Map.class, mTest13Fragment));
+        mTimer = new Timer();
+        mTimer.schedule(new GetRoadStatusTimerTask(new AllGetRoadStatusCallBack(Map.class, mTest13Fragment)), 0, 3000);
     }
 
     @Override
     protected void onDims() {
         mSenseDataMap = null;
+        mSenseAdapter = null;
+        mTimer.cancel();
+        mTimer = null;
+        mRoadIdReqIndex = 0;
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.test13_btn_flush:
-
+                RequestPool.getInstance().add("http://192.168.2.19:9090/transportservice/type/jason/action/GetAllSense.do", null,
+                        new GetAllSenseCallBack(Map.class, mTest13Fragment));
                 break;
         }
+    }
+
+    private static class AllGetRoadStatusCallBack extends HttpUtils.Callback<Map> {
+
+        private final Test13Fragment mTest13Fragment_inner;
+
+        /**
+         * @param mapClass       结果数据封装体类型字节码
+         * @param test13Fragment
+         */
+        AllGetRoadStatusCallBack(Class<Map> mapClass, Test13Fragment test13Fragment) {
+            super(mapClass);
+            mTest13Fragment_inner = test13Fragment;
+        }
+
+        @Override
+        protected void onSuccess(Map map) {
+            try {
+                int status = DataUtils.obj2int(map.get("Status"));
+                View[] viewArr = mTest13Fragment_inner.getRoadUiViewArr()[mTest13Fragment_inner.getRoadIdReqIndex()];
+                for (View view : viewArr) {
+                    int binarySearchStatus = Arrays.binarySearch(mTest13Fragment_inner.getRoadStatusArr(), status);
+                    view.setBackgroundResource(mTest13Fragment_inner.getRoadStatusResIdArr()[binarySearchStatus]);
+                }
+            } catch (AppException e) {
+                e.printStackTrace();
+            }
+            mTest13Fragment_inner.setRoadIdReqIndex(mTest13Fragment_inner.getRoadIdReqIndex() + 1);
+            if (mTest13Fragment_inner.getRoadIdReqIndex() < mTest13Fragment_inner.getRoadIdArr().length) {
+                Map<String, Integer> reqValues = new HashMap<>();
+                reqValues.put("RoadId", mTest13Fragment_inner.getRoadIdArr()[mTest13Fragment_inner.getRoadIdReqIndex()]);
+                RequestPool.getInstance().add("http://192.168.2.19:9090/transportservice/type/jason/action/GetRoadStatus.do",
+                        reqValues, this);
+            }
+        }
+
+    }
+
+    private class GetRoadStatusTimerTask extends TimerTask {
+
+        private final AllGetRoadStatusCallBack mAllGetRoadStatusCallBack;
+
+        GetRoadStatusTimerTask(AllGetRoadStatusCallBack allGetRoadStatusCallBack) {
+            mAllGetRoadStatusCallBack = allGetRoadStatusCallBack;
+        }
+
+        @Override
+        public void run() {
+            mRoadIdReqIndex = 0;
+            Map<String, Integer> reqValues = new HashMap<>();
+            reqValues.put("RoadId", mRoadIdArr[mRoadIdReqIndex]);
+            RequestPool.getInstance().add("http://192.168.2.19:9090/transportservice/type/jason/action/GetRoadStatus.do",
+                    reqValues, mAllGetRoadStatusCallBack);
+        }
+
     }
 
     private class SenseAdapter extends BaseAdapter {
 
         @Override
         public int getCount() {
-            return mSenseNameArr.length;
+            return mSenseDataMap.size();
         }
 
         @Override
@@ -260,13 +346,52 @@ public class Test13Fragment extends BaseFragment implements View.OnClickListener
 
         @Override
         protected void onSuccess(Map map) {
-            mTest13Fragment_inner.setSenseDataMap(map);
+            Map<String, Double> senseDataMap = mTest13Fragment_inner.getSenseDataMap();
+            for (String senseName : mTest13Fragment_inner.getSenseNameArr()) {
+                senseDataMap.put(senseName, (Double) map.get(senseName));
+            }
+            SenseAdapter senseAdapter = mTest13Fragment_inner.getSenseAdapter();
+            if (senseAdapter != null) {
+                senseAdapter.notifyDataSetChanged();
+            }
         }
 
     }
 
-    public void setSenseDataMap(Map<String, Double> senseDataMap) {
-        mSenseDataMap = senseDataMap;
+    public Map<String, Double> getSenseDataMap() {
+        return mSenseDataMap;
+    }
+
+    public String[] getSenseNameArr() {
+        return mSenseNameArr;
+    }
+
+    public SenseAdapter getSenseAdapter() {
+        return mSenseAdapter;
+    }
+
+    public int getRoadIdReqIndex() {
+        return mRoadIdReqIndex;
+    }
+
+    public void setRoadIdReqIndex(int roadIdReqIndex) {
+        mRoadIdReqIndex = roadIdReqIndex;
+    }
+
+    public Integer[] getRoadIdArr() {
+        return mRoadIdArr;
+    }
+
+    public View[][] getRoadUiViewArr() {
+        return mRoadUiViewArr;
+    }
+
+    public Integer[] getRoadStatusResIdArr() {
+        return mRoadStatusResIdArr;
+    }
+
+    public Integer[] getRoadStatusArr() {
+        return mRoadStatusArr;
     }
 
 }
