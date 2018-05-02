@@ -257,6 +257,7 @@ public class Test13Fragment extends BaseFragment implements View.OnClickListener
             mTest13Fragment_inner = test13Fragment;
         }
 
+
         @Override
         protected void onSuccess(Map map) {
             mTest13Fragment_inner.setSenseDataMap(map);
