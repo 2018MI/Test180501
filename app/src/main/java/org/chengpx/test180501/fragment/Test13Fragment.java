@@ -138,6 +138,7 @@ public class Test13Fragment extends BaseFragment implements View.OnClickListener
         mRoadIdReqIndex = 0;
     }
 
+    //点击按钮刷新传感器
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
@@ -148,6 +149,7 @@ public class Test13Fragment extends BaseFragment implements View.OnClickListener
         }
     }
 
+    //道路状态的Callback方法
     private static class AllGetRoadStatusCallBack extends HttpUtils.Callback<Map> {
 
         private final Test13Fragment mTest13Fragment_inner;
@@ -184,6 +186,7 @@ public class Test13Fragment extends BaseFragment implements View.OnClickListener
 
     }
 
+    //定时器，定时刷新道路状态
     private class GetRoadStatusTimerTask extends TimerTask {
 
         private final AllGetRoadStatusCallBack mAllGetRoadStatusCallBack;

@@ -117,6 +117,14 @@
             android:text="停车场"
             android:textColor="#ffff" />
 
+        <ListView
+            android:id="@+id/test13_lv_roadstatusexmaple"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_alignParentBottom="true"
+            android:layout_alignParentLeft="true"
+            android:layout_weight="1" />
+
     </RelativeLayout>
 
     <LinearLayout
@@ -177,12 +185,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="道路拥挤状态示意: " />
-
-                <ListView
-                    android:id="@+id/test13_lv_roadstatusexmaple"
-                    android:layout_width="match_parent"
-                    android:layout_height="0dp"
-                    android:layout_weight="1" />
 
             </LinearLayout>
 

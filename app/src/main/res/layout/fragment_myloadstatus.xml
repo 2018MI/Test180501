@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal">
+
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_pm25"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="20dp"
+            android:text="PM2.5当前值:520"
+            android:textSize="30dp" />
+
+        <TextView
+            android:id="@+id/tv_pm25_des"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="100dp"
+            android:text="友情提示:不适合出行"
+            android:textSize="30dp" />
+
+        <VideoView
+            android:id="@+id/vv_pm25"
+            android:layout_width="400dp"
+            android:layout_height="300dp"
+            android:layout_margin="50dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/tv_light_now"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="20dp"
+            android:text="光照强度当前值：1256"
+            android:textSize="30dp" />
+
+        <TextView
+            android:id="@+id/tv_light_max"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:text="光照强度上限值：3190"
+            android:textSize="30dp" />
+
+        <TextView
+            android:id="@+id/tv_light_min"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:text="光照强度下限值：1100"
+            android:textSize="30dp" />
+
+        <TextView
+            android:id="@+id/tv_light_des"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:layout_marginTop="100dp"
+            android:text="友情提示:适合出行"
+            android:textSize="30dp" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="100dp"
+            android:orientation="horizontal">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="0"
+                android:layout_marginLeft="20dp"
+                android:textSize="25dp"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="1100"
+                android:layout_marginLeft="50dp"
+                android:textSize="25dp"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="3190"
+                android:layout_marginLeft="120dp"
+                android:textSize="25dp"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:layout_marginLeft="20dp"
+
+            android:orientation="horizontal">
+
+            <View
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:background="#EE0000" />
+
+            <View
+                android:layout_width="200dp"
+                android:layout_height="50dp"
+                android:background="#7FFF00" />
+
+            <View
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:background="#EE0000" />
+        </LinearLayout>
+
+        <SeekBar
+            android:id="@+id/seekbar"
+            style="@style/CustomSeekbarStyle"
+            android:layout_width="300dp"
+            android:layout_height="50dp"
+            android:layout_marginTop="20dp"
+            android:progress="50" />
+
+        <TextView
+            android:id="@+id/tv_light_seekbar_num"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="20dp"
+            android:text="1256"
+            android:textSize="30dp" />
+
+
+    </LinearLayout>
+
+</LinearLayout>

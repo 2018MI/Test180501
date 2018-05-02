@@ -54,7 +54,7 @@ public class Test46Fragment extends BaseFragment implements RadioGroup.OnChecked
 
     @Override
     protected void main() {
-        test46_noscrollviewpager_content.setAdapter(new MyPagerAdapter(getFragmentManager()));
+        test46_noscrollviewpager_content.setAdapter(new MyPagerAdapter(getChildFragmentManager()));
     }
 
     @Override
