@@ -1,18 +1,19 @@
-package org.chengpx.test180501.fragment;
+package org.chengpx.test180501.fragment.test46;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import org.chengpx.mylib.BaseFragment;
 
 /**
- * 第46题编码实现我的交通功能
+ * 我的路况
  * <p>
- * create at 2018/5/1 17:06 by chengpx
+ * create at 2018/5/2 11:15 by chengpx
  */
-public class Test46Fragment extends BaseFragment {
+public class MyRoad46Fragment extends BaseFragment {
 
     @Override
     protected void initListener() {
@@ -21,7 +22,9 @@ public class Test46Fragment extends BaseFragment {
 
     @Override
     protected View initView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return null;
+        TextView textView = new TextView(mFragmentActivity);
+        textView.setText("我的路况");
+        return textView;
     }
 
     @Override

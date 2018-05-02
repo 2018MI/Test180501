@@ -1,18 +1,15 @@
-package org.chengpx.test180501.fragment;
+package org.chengpx.test180501.fragment.Test4;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import org.chengpx.mylib.BaseFragment;
 import org.chengpx.test180501.R;
-import org.chengpx.test180501.fragment.Test4.PicFragment;
-import org.chengpx.test180501.fragment.Test4.VideoFragment;
 
 import java.util.ArrayList;
 
