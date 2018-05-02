@@ -30,7 +30,7 @@ public abstract class BaseFragment extends Fragment {
     protected abstract View initView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState);
 
     @Override
-    public void onDestroyView() {
+    public final void onDestroyView() {
         super.onDestroyView();
         onDie();
     }
@@ -38,7 +38,7 @@ public abstract class BaseFragment extends Fragment {
     protected abstract void onDie();
 
     @Override
-    public void onResume() {
+    public final void onResume() {
         super.onResume();
         initData();
         main();
@@ -49,7 +49,7 @@ public abstract class BaseFragment extends Fragment {
     protected abstract void initData();
 
     @Override
-    public void onPause() {
+    public final void onPause() {
         super.onPause();
         onDims();
     }

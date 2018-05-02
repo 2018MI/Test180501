@@ -8,6 +8,8 @@ import android.view.ViewGroup;
 import org.chengpx.mylib.BaseFragment;
 
 /**
+ * 第4题编码实现车辆违章浏览功能1
+ * <p>
  * create at 2018/5/1 17:04 by chengpx
  */
 public class Test4Fragment extends BaseFragment {
