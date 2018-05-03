@@ -1,4 +1,4 @@
-package org.chengpx.test180501.view;
+package org.chengpx.mylib.view;
 
 import android.annotation.SuppressLint;
 import android.content.Context;

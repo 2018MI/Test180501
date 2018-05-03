@@ -1,14 +1,20 @@
 package org.chengpx.test180501.fragment.test46;
 
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.content.Context;
 import android.os.Bundle;
+import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
-import org.chengpx.mylib.BaseFragment;
+import org.chengpx.mylib.AppException;
+import org.chengpx.mylib.ViewPagerFragment;
+import org.chengpx.mylib.common.DataUtils;
 import org.chengpx.mylib.http.HttpUtils;
 import org.chengpx.mylib.http.RequestPool;
 import org.chengpx.test180501.R;
@@ -23,7 +29,7 @@ import java.util.TimerTask;
  * <p>
  * create at 2018/5/2 11:15 by chengpx
  */
-public class MyRoad46Fragment extends BaseFragment {
+public class MyRoad46Fragment extends ViewPagerFragment {
 
     private static String sTag = "org.chengpx.test180501.fragment.test46.MyRoad46Fragment";
 
@@ -66,6 +72,7 @@ public class MyRoad46Fragment extends BaseFragment {
 
     @Override
     protected void initData() {
+        Log.d(sTag, "MyRoad46Fragment initData");
         mTrafficLightInfoMap = new HashMap<>();
         for (Integer aMTrafficLightIdArr : mTrafficLightIdArr) {
             mTrafficLightInfoMap.put(aMTrafficLightIdArr, new HashMap<String, Object>());
@@ -82,6 +89,8 @@ public class MyRoad46Fragment extends BaseFragment {
 
     @Override
     protected void onDims() {
+        Log.d(sTag, "MyRoad46Fragment onDims");
+
         mTrafficLightInfoMap = null;
         mTimer.cancel();
         mTimer = null;
@@ -92,17 +101,38 @@ public class MyRoad46Fragment extends BaseFragment {
 
     private static class GetRoadStatusCallBack extends HttpUtils.Callback<Map> {
 
+        private final MyRoad46Fragment mMyRoad46Fragment_inner;
+
         /**
-         * @param mapClass 结果数据封装体类型字节码
+         * @param mapClass         结果数据封装体类型字节码
          * @param myRoad46Fragment
          */
         GetRoadStatusCallBack(Class<Map> mapClass, MyRoad46Fragment myRoad46Fragment) {
             super(mapClass);
+            mMyRoad46Fragment_inner = myRoad46Fragment;
         }
 
         @Override
         protected void onSuccess(Map map) {
+            try {
+                int status = DataUtils.obj2int(map.get("Status"));
+                if (status > 3) {
+                    notifyMsg(mMyRoad46Fragment_inner.getRoadIdArr()[mMyRoad46Fragment_inner.mRoadIdReqIndex] + " 号路口处于拥挤状态, 请选择合适的路线");
+                }
+            } catch (AppException e) {
+                e.printStackTrace();
+            }
+        }
 
+        private void notifyMsg(String msg) {
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(mMyRoad46Fragment_inner.getActivity());
+            Notification notification = builder.setSmallIcon(R.mipmap.ic_launcher)
+                    .setContentTitle(msg)
+                    .build();
+            NotificationManager notificationManager = (NotificationManager) mMyRoad46Fragment_inner.getActivity()
+                    .getSystemService(Context.NOTIFICATION_SERVICE);
+            assert notificationManager != null;
+            notificationManager.notify(1, notification);
         }
 
     }
@@ -112,7 +142,7 @@ public class MyRoad46Fragment extends BaseFragment {
         private final MyRoad46Fragment mMyRoad46Fragment_inner;
 
         /**
-         * @param mapClass            结果数据封装体类型字节码
+         * @param mapClass         结果数据封装体类型字节码
          * @param myRoad46Fragment
          */
         GetTrafficLightConfigActionCallBack(Class<Map> mapClass, MyRoad46Fragment myRoad46Fragment) {
@@ -146,7 +176,7 @@ public class MyRoad46Fragment extends BaseFragment {
         private final MyRoad46Fragment mMyRoad46Fragment_inner;
 
         /**
-         * @param mapClass            结果数据封装体类型字节码
+         * @param mapClass         结果数据封装体类型字节码
          * @param myRoad46Fragment
          */
         GetTrafficLightNowStatusCallBack(Class<Map> mapClass, MyRoad46Fragment myRoad46Fragment) {

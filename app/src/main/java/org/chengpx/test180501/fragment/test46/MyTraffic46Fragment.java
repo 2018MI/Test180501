@@ -13,7 +13,7 @@ import android.widget.MediaController;
 import android.widget.TextView;
 
 import org.chengpx.mylib.AppException;
-import org.chengpx.mylib.BaseFragment;
+import org.chengpx.mylib.ViewPagerFragment;
 import org.chengpx.mylib.common.DataUtils;
 import org.chengpx.mylib.http.HttpUtils;
 import org.chengpx.test180501.R;
@@ -27,7 +27,7 @@ import java.util.TimerTask;
  * <p>
  * create at 2018/5/2 11:16 by chengpx
  */
-public class MyTraffic46Fragment extends BaseFragment {
+public class MyTraffic46Fragment extends ViewPagerFragment {
 
     private View inflate;
     private TextView tvPm25;
@@ -41,8 +41,6 @@ public class MyTraffic46Fragment extends BaseFragment {
     private android.widget.SeekBar seekbar;
     private TextView tvLightSeekbarNum;
     private Timer timer;
-    private boolean isVisible;
-    private boolean isViewCreated;
 
     @Override
     protected void initListener() {
@@ -65,17 +63,14 @@ public class MyTraffic46Fragment extends BaseFragment {
     protected void main() {
 
     }
+
     @Override
     protected void initData() {
+
         timer = new Timer();
         timer.schedule(new MyTimerTask(new Callback(Map.class)), 0, 3000);
     }
 
-    @Override
-    protected void onDims() {
-        timer.cancel();
-        timer = null;
-    }
 
     public class Callback extends HttpUtils.Callback<Map> {
 
@@ -156,6 +151,11 @@ public class MyTraffic46Fragment extends BaseFragment {
         }
     }
 
+    @Override
+    protected void onDims() {
+        timer.cancel();
+        timer = null;
+    }
 
     private void initView() {
         tvPm25 = inflate.findViewById(R.id.tv_pm25);

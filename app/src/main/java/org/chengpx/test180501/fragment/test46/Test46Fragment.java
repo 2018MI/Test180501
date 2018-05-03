@@ -5,7 +5,6 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.Gravity;
@@ -16,8 +15,8 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 
 import org.chengpx.mylib.BaseFragment;
+import org.chengpx.mylib.ViewPagerFragment;
 import org.chengpx.test180501.R;
-import org.chengpx.test180501.view.NoScrollViewPager;
 
 /**
  * 第46题编码实现我的交通功能
@@ -28,9 +27,9 @@ public class Test46Fragment extends BaseFragment implements RadioGroup.OnChecked
 
     private String mTag = "org.chengpx.test180501.fragment.test46.Test46Fragment";
 
-    private NoScrollViewPager test46_noscrollviewpager_content;
+    private ViewPager test46_noscrollviewpager_content;
     private RadioGroup test46_radiogroup_indicators;
-    private BaseFragment[] mBaseFragmentArr = {
+    private ViewPagerFragment[] mBaseFragmentArr = {
             new MyRoad46Fragment(), new MyTraffic46Fragment()
     };
     private String[] mMoudleNameArr = {
@@ -45,16 +44,14 @@ public class Test46Fragment extends BaseFragment implements RadioGroup.OnChecked
     @Override
     protected View initView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_test46, container, false);
-        test46_noscrollviewpager_content = view.findViewById(R.id.test46_noscrollviewpager_content);
+        test46_noscrollviewpager_content = (ViewPager) view.findViewById(R.id.test46_noscrollviewpager_content);
         test46_radiogroup_indicators = view.findViewById(R.id.test46_radiogroup_indicators);
-        test46_noscrollviewpager_content.setOffscreenPageLimit(0);
+
         return view;
     }
 
-
     @Override
     protected void onDie() {
-
     }
 
     @Override
@@ -74,7 +71,6 @@ public class Test46Fragment extends BaseFragment implements RadioGroup.OnChecked
             radioButton.setGravity(Gravity.CENTER);
             test46_radiogroup_indicators.addView(radioButton);
         }
-        test46_noscrollviewpager_content.setOffscreenPageLimit(0);
     }
 
     @Override
