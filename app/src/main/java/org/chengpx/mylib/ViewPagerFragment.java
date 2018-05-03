@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,8 +17,19 @@ import android.view.ViewGroup;
 public abstract class ViewPagerFragment extends Fragment {
 
     protected FragmentActivity mFragmentActivity;
-    protected boolean mIsVisibleToUser;
-    protected boolean mIsFirstUsserVisibleHint = true;
+    /**
+     * 存储 isVisibleToUser
+     */
+    private boolean mIsVisibleToUser;
+    /**
+     * 是否第一次展现
+     */
+    private boolean mIsFirstUsserVisibleHint = true;
+    /**
+     * 是否已经调用 initData(), main()
+     */
+    private boolean mIsInit;
+    private String mTag = getClass().getName();
 
     @Override
     public void onAttach(Context context) {
@@ -32,8 +44,10 @@ public abstract class ViewPagerFragment extends Fragment {
         View view = initView(inflater, container, savedInstanceState);
         initListener();
         if (getUserVisibleHint()) {
+            Log.d(mTag, "onCreateView initData main");
             initData();
             main();
+            mIsInit = true;
         }
         return view;
     }
@@ -45,6 +59,7 @@ public abstract class ViewPagerFragment extends Fragment {
     @Override
     public final void onDestroyView() {
         super.onDestroyView();
+        Log.d(mTag, "onDestroyView");
         onDie();
     }
 
@@ -63,11 +78,19 @@ public abstract class ViewPagerFragment extends Fragment {
         }
         if (isVisibleToUser) {
             if (!mIsFirstUsserVisibleHint) {
+                Log.d(mTag, "setUserVisibleHint initData main");
                 initData();
                 main();
+                mIsInit = true;
             }
         } else {
-            onDims();
+            Log.d(mTag, "setUserVisibleHint onDims");
+            if (mIsInit) {
+                onDims();
+                mIsFirstUsserVisibleHint = true;
+                mIsVisibleToUser = false;
+                mIsInit = false;
+            }
         }
         mIsVisibleToUser = isVisibleToUser;
     }

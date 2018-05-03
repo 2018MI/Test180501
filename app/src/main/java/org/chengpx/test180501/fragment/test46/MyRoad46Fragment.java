@@ -49,11 +49,12 @@ public class MyRoad46Fragment extends ViewPagerFragment {
 
     @Override
     protected void initListener() {
-
+        // Log.d(sTag, "MyRoad46Fragment initListener");
     }
 
     @Override
     protected View initView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        // Log.d(sTag, "MyRoad46Fragment initView");
         mMyRoad46Fragment = this;
         View view = inflater.inflate(R.layout.fragment_myroad46, container, false);
         test46_lv_trafficinfoList = (ListView) view.findViewById(R.id.test46_lv_trafficlightinfoList);
@@ -62,22 +63,21 @@ public class MyRoad46Fragment extends ViewPagerFragment {
 
     @Override
     protected void onDie() {
-
+        // Log.d(sTag, "MyRoad46Fragment onDie");
     }
 
     @Override
     protected void main() {
-
+        // Log.d(sTag, "MyRoad46Fragment main");
     }
 
     @Override
     protected void initData() {
-        Log.d(sTag, "MyRoad46Fragment initData");
+        // Log.d(sTag, "MyRoad46Fragment initData");
         mTrafficLightInfoMap = new HashMap<>();
         for (Integer aMTrafficLightIdArr : mTrafficLightIdArr) {
             mTrafficLightInfoMap.put(aMTrafficLightIdArr, new HashMap<String, Object>());
         }
-        mTrafficLightIdGetTrafficLightConfigActionReqIndex = 0;
         Map<String, Integer> reqValues = new HashMap<>();
         reqValues.put("TrafficLightId", mTrafficLightIdArr[mTrafficLightIdGetTrafficLightConfigActionReqIndex]);
         RequestPool.getInstance().add("http://192.168.2.19:9090/transportservice/type/jason/action/GetTrafficLightConfigAction.do",
@@ -89,11 +89,10 @@ public class MyRoad46Fragment extends ViewPagerFragment {
 
     @Override
     protected void onDims() {
-        Log.d(sTag, "MyRoad46Fragment onDims");
-
-        mTrafficLightInfoMap = null;
+        // Log.d(sTag, "MyRoad46Fragment onDims");
         mTimer.cancel();
         mTimer = null;
+        mTrafficLightInfoMap = null;
         mTrafficLightIdGetTrafficLightNowStatusReqIndex = 0;
         mTrafficLightIdGetTrafficLightConfigActionReqIndex = 0;
         mRoadIdReqIndex = 0;

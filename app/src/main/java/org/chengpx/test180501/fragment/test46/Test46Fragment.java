@@ -6,8 +6,8 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,7 +18,8 @@ import android.widget.RadioGroup;
 import org.chengpx.mylib.BaseFragment;
 import org.chengpx.mylib.ViewPagerFragment;
 import org.chengpx.test180501.R;
-import org.chengpx.test180501.view.NoScrollViewPager;
+
+import java.util.List;
 
 /**
  * 第46题编码实现我的交通功能
@@ -27,7 +28,7 @@ import org.chengpx.test180501.view.NoScrollViewPager;
  */
 public class Test46Fragment extends BaseFragment implements RadioGroup.OnCheckedChangeListener {
 
-    private String mTag = "org.chengpx.test180501.fragment.test46.Test46Fragment";
+    private static String sTag = "org.chengpx.test180501.fragment.test46.Test46Fragment";
 
     private ViewPager test46_noscrollviewpager_content;
     private RadioGroup test46_radiogroup_indicators;
@@ -37,34 +38,39 @@ public class Test46Fragment extends BaseFragment implements RadioGroup.OnChecked
     private String[] mMoudleNameArr = {
             "我的路况", "我的交通"
     };
+    private MyPagerAdapter mMyPagerAdapter;
 
     @Override
     protected void initListener() {
+        Log.d(sTag, "Test46Fragment initListener");
         test46_radiogroup_indicators.setOnCheckedChangeListener(this);
     }
 
     @Override
     protected View initView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        Log.d(sTag, "Test46Fragment initView");
         View view = inflater.inflate(R.layout.fragment_test46, container, false);
         test46_noscrollviewpager_content = view.findViewById(R.id.test46_noscrollviewpager_content);
         test46_radiogroup_indicators = view.findViewById(R.id.test46_radiogroup_indicators);
-
         return view;
     }
 
 
     @Override
     protected void onDie() {
-
+        Log.d(sTag, "Test46Fragment onDie");
     }
 
     @Override
     protected void main() {
-        test46_noscrollviewpager_content.setAdapter(new MyPagerAdapter(getChildFragmentManager()));
+        Log.d(sTag, "Test46Fragment main");
+        mMyPagerAdapter = new MyPagerAdapter(getChildFragmentManager());
+        test46_noscrollviewpager_content.setAdapter(mMyPagerAdapter);
     }
 
     @Override
     protected void initData() {
+        Log.d(sTag, "Test46Fragment initData");
         RadioGroup.LayoutParams layoutParams = new RadioGroup.LayoutParams(0,
                 RadioGroup.LayoutParams.WRAP_CONTENT, 1);// 第三个参数为权重
         for (String moduleName : mMoudleNameArr) {
@@ -79,6 +85,12 @@ public class Test46Fragment extends BaseFragment implements RadioGroup.OnChecked
 
     @Override
     protected void onDims() {
+        Log.d(sTag, "Test46Fragment onDims");
+        mMyPagerAdapter = null;
+        List<Fragment> fragments = getChildFragmentManager().getFragments();
+        for (Fragment fragment : fragments) {
+            fragment.setUserVisibleHint(false);
+        }
     }
 
     @Override

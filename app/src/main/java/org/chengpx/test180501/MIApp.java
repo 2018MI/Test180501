@@ -23,6 +23,7 @@ public class MIApp extends Application implements Thread.UncaughtExceptionHandle
         Log.d(mTag, "t.getName: " + t.getName());
         e.printStackTrace();
         Toast.makeText(this, "服务器已崩溃请立即重启", Toast.LENGTH_SHORT).show();
+        System.exit(0);
     }
 
 }

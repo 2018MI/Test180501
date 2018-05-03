@@ -29,6 +29,8 @@ import java.util.TimerTask;
  */
 public class MyTraffic46Fragment extends ViewPagerFragment {
 
+    private static String sTag = "org.chengpx.test180501.fragment.test46.MyTraffic46Fragment";
+
     private View inflate;
     private TextView tvPm25;
     private TextView tvPm25Des;
@@ -47,11 +49,12 @@ public class MyTraffic46Fragment extends ViewPagerFragment {
 
     @Override
     protected void initListener() {
-
+        // Log.d(sTag, "MyTraffic46Fragment initListener");
     }
 
     @Override
     protected View initView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        // Log.d(sTag, "MyTraffic46Fragment initView");
         inflate = inflater.inflate(R.layout.fragment_myloadstatus, container, false);
         initView();
         return inflate;
@@ -59,22 +62,24 @@ public class MyTraffic46Fragment extends ViewPagerFragment {
 
     @Override
     protected void onDie() {
-
+        // Log.d(sTag, "MyTraffic46Fragment onDie");
     }
 
     @Override
     protected void main() {
-
+        // Log.d(sTag, "MyTraffic46Fragment main");
     }
 
     @Override
     protected void initData() {
+        // Log.d(sTag, "MyTraffic46Fragment initData");
         timer = new Timer();
         timer.schedule(new MyTimerTask(new Callback(Map.class)), 0, 3000);
     }
 
     @Override
     protected void onDims() {
+        // Log.d(sTag, "MyTraffic46Fragment onDims");
         timer.cancel();
         timer = null;
     }
