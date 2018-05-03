@@ -41,6 +41,9 @@ public class MyTraffic46Fragment extends ViewPagerFragment {
     private android.widget.SeekBar seekbar;
     private TextView tvLightSeekbarNum;
     private Timer timer;
+    private boolean isVisible;
+    private boolean isViewCreated;
+    private NotificationManager manager;
 
     @Override
     protected void initListener() {
@@ -66,11 +69,15 @@ public class MyTraffic46Fragment extends ViewPagerFragment {
 
     @Override
     protected void initData() {
-
         timer = new Timer();
         timer.schedule(new MyTimerTask(new Callback(Map.class)), 0, 3000);
     }
 
+    @Override
+    protected void onDims() {
+        timer.cancel();
+        timer = null;
+    }
 
     public class Callback extends HttpUtils.Callback<Map> {
 
@@ -110,7 +117,7 @@ public class MyTraffic46Fragment extends ViewPagerFragment {
                     tvLightDes.setText("不适合出行");
                     seekbar.setProgress(light);
                     tvLightSeekbarNum.setText(light + "");
-                    NotificationManager manager = (NotificationManager) getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
+                    manager = (NotificationManager) getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
                     Notification notification = new NotificationCompat.Builder(getContext())
                             .setContentText("光照较强，出门请戴墨镜")
                             .setSmallIcon(R.mipmap.ic_launcher)
@@ -120,7 +127,7 @@ public class MyTraffic46Fragment extends ViewPagerFragment {
                     tvLightDes.setText("不适合出行");
                     seekbar.setProgress(light);
                     tvLightSeekbarNum.setText(light + "");
-                    NotificationManager manager = (NotificationManager) getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
+                    manager = (NotificationManager) getActivity().getSystemService(Context.NOTIFICATION_SERVICE);
                     Notification notification = new NotificationCompat.Builder(getContext())
                             .setContentText("光照较弱，出门请开灯")
                             .setSmallIcon(R.mipmap.ic_launcher)
@@ -151,11 +158,6 @@ public class MyTraffic46Fragment extends ViewPagerFragment {
         }
     }
 
-    @Override
-    protected void onDims() {
-        timer.cancel();
-        timer = null;
-    }
 
     private void initView() {
         tvPm25 = inflate.findViewById(R.id.tv_pm25);
