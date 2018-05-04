@@ -102,9 +102,9 @@ public class MyRoad46Fragment extends ViewPagerFragment implements View.OnClickL
         Map<String, Integer> reqValues = new HashMap<>();
         reqValues.put("TrafficLightId", mTrafficLightIdArr[mTrafficLightIdGetTrafficLightConfigActionReqIndex]);
         RequestPool.getInstance().add("http://192.168.2.19:9090/transportservice/type/jason/action/GetTrafficLightConfigAction.do",
-                reqValues, new GetTrafficLightConfigActionCallBack(Map.class, mMyRoad46Fragment));
+                reqValues, new AllGetTrafficLightConfigActionCallBack(Map.class, mMyRoad46Fragment));
         mTimer = new Timer();
-        mTimer.schedule(new MyTimerTask(new GetTrafficLightNowStatusCallBack(Map.class, mMyRoad46Fragment), new GetRoadStatusCallBack(Map.class, mMyRoad46Fragment)),
+        mTimer.schedule(new MyTimerTask(new AllGetTrafficLightNowStatusCallBack(Map.class, mMyRoad46Fragment), new AllGetRoadStatusCallBack(Map.class, mMyRoad46Fragment)),
                 0, 1000);
     }
 
@@ -220,6 +220,11 @@ public class MyRoad46Fragment extends ViewPagerFragment implements View.OnClickL
             } else {
                 Toast.makeText(mMyRoad46Fragment_inner.getActivity(), "配置失败请重新提交", Toast.LENGTH_SHORT).show();
             }
+            mMyRoad46Fragment_inner.setTrafficLightIdGetTrafficLightConfigActionReqIndex(0);
+            Map<String, Integer> reqValues = new HashMap<>();
+            reqValues.put("TrafficLightId", mMyRoad46Fragment_inner.getTrafficLightIdArr()[mMyRoad46Fragment_inner.getTrafficLightIdGetTrafficLightConfigActionReqIndex()]);
+            RequestPool.getInstance().add("http://192.168.2.19:9090/transportservice/type/jason/action/GetTrafficLightConfigAction.do",
+                    reqValues, new AllGetTrafficLightConfigActionCallBack(Map.class, mMyRoad46Fragment_inner));
         }
 
     }
@@ -350,7 +355,7 @@ public class MyRoad46Fragment extends ViewPagerFragment implements View.OnClickL
 
     }
 
-    private static class GetRoadStatusCallBack extends HttpUtils.Callback<Map> {
+    private static class AllGetRoadStatusCallBack extends HttpUtils.Callback<Map> {
 
         private final MyRoad46Fragment mMyRoad46Fragment_inner;
 
@@ -358,7 +363,7 @@ public class MyRoad46Fragment extends ViewPagerFragment implements View.OnClickL
          * @param mapClass         结果数据封装体类型字节码
          * @param myRoad46Fragment
          */
-        GetRoadStatusCallBack(Class<Map> mapClass, MyRoad46Fragment myRoad46Fragment) {
+        AllGetRoadStatusCallBack(Class<Map> mapClass, MyRoad46Fragment myRoad46Fragment) {
             super(mapClass);
             mMyRoad46Fragment_inner = myRoad46Fragment;
         }
@@ -386,7 +391,18 @@ public class MyRoad46Fragment extends ViewPagerFragment implements View.OnClickL
                 e.printStackTrace();
             }
             mMyRoad46Fragment_inner
-                    .setRoadIdReqIndex((mMyRoad46Fragment_inner.getRoadIdReqIndex() + 1) % mMyRoad46Fragment_inner.getRoadIdArr().length);
+                    .setRoadIdReqIndex((mMyRoad46Fragment_inner.getRoadIdReqIndex() + 1));
+            if (mMyRoad46Fragment_inner.getRoadIdReqIndex() < mMyRoad46Fragment_inner.getRoadIdArr().length) {
+                Map<String, Integer> reqValues = new HashMap<>();
+                reqValues.put("RoadId", mMyRoad46Fragment_inner.getRoadIdArr()[mMyRoad46Fragment_inner.getRoadIdReqIndex()]);
+                RequestPool.getInstance().add("http://192.168.2.19:9090/transportservice/type/jason/action/GetRoadStatus.do",
+                        reqValues, this);
+            } else {
+                MyAdapter myAdapter = mMyRoad46Fragment_inner.getMyAdapter();
+                if (myAdapter != null) {
+                    myAdapter.notifyDataSetChanged();
+                }
+            }
         }
 
         private void notifyMsg(String msg) {
@@ -402,7 +418,7 @@ public class MyRoad46Fragment extends ViewPagerFragment implements View.OnClickL
 
     }
 
-    private static class GetTrafficLightConfigActionCallBack extends HttpUtils.Callback<Map> {
+    private static class AllGetTrafficLightConfigActionCallBack extends HttpUtils.Callback<Map> {
 
         private final MyRoad46Fragment mMyRoad46Fragment_inner;
 
@@ -410,7 +426,7 @@ public class MyRoad46Fragment extends ViewPagerFragment implements View.OnClickL
          * @param mapClass         结果数据封装体类型字节码
          * @param myRoad46Fragment
          */
-        GetTrafficLightConfigActionCallBack(Class<Map> mapClass, MyRoad46Fragment myRoad46Fragment) {
+        AllGetTrafficLightConfigActionCallBack(Class<Map> mapClass, MyRoad46Fragment myRoad46Fragment) {
             super(mapClass);
             mMyRoad46Fragment_inner = myRoad46Fragment;
         }
@@ -439,7 +455,7 @@ public class MyRoad46Fragment extends ViewPagerFragment implements View.OnClickL
 
     }
 
-    private static class GetTrafficLightNowStatusCallBack extends HttpUtils.Callback<Map> {
+    private static class AllGetTrafficLightNowStatusCallBack extends HttpUtils.Callback<Map> {
 
         private final MyRoad46Fragment mMyRoad46Fragment_inner;
 
@@ -447,7 +463,7 @@ public class MyRoad46Fragment extends ViewPagerFragment implements View.OnClickL
          * @param mapClass         结果数据封装体类型字节码
          * @param myRoad46Fragment
          */
-        GetTrafficLightNowStatusCallBack(Class<Map> mapClass, MyRoad46Fragment myRoad46Fragment) {
+        AllGetTrafficLightNowStatusCallBack(Class<Map> mapClass, MyRoad46Fragment myRoad46Fragment) {
             super(mapClass);
             mMyRoad46Fragment_inner = myRoad46Fragment;
         }
@@ -478,12 +494,12 @@ public class MyRoad46Fragment extends ViewPagerFragment implements View.OnClickL
 
     private class MyTimerTask extends TimerTask {
 
-        private final GetTrafficLightNowStatusCallBack mGetTrafficLightNowStatusCallBack;
-        private final GetRoadStatusCallBack mGetRoadStatusCallBack;
+        private final AllGetTrafficLightNowStatusCallBack mAllGetTrafficLightNowStatusCallBack;
+        private final AllGetRoadStatusCallBack mAllGetRoadStatusCallBack;
 
-        MyTimerTask(GetTrafficLightNowStatusCallBack getTrafficLightNowStatusCallBack, GetRoadStatusCallBack getRoadStatusCallBack) {
-            mGetTrafficLightNowStatusCallBack = getTrafficLightNowStatusCallBack;
-            mGetRoadStatusCallBack = getRoadStatusCallBack;
+        MyTimerTask(AllGetTrafficLightNowStatusCallBack allGetTrafficLightNowStatusCallBack, AllGetRoadStatusCallBack allGetRoadStatusCallBack) {
+            mAllGetTrafficLightNowStatusCallBack = allGetTrafficLightNowStatusCallBack;
+            mAllGetRoadStatusCallBack = allGetRoadStatusCallBack;
         }
 
         @Override
@@ -492,10 +508,11 @@ public class MyRoad46Fragment extends ViewPagerFragment implements View.OnClickL
             Map<String, Integer> reqValues = new HashMap<>();
             reqValues.put("TrafficLightId", mTrafficLightIdArr[mTrafficLightIdGetTrafficLightNowStatusReqIndex]);
             RequestPool.getInstance().add("http://192.168.2.19:9090/transportservice/type/jason/action/GetTrafficLightNowStatus.do",
-                    reqValues, mGetTrafficLightNowStatusCallBack);
+                    reqValues, mAllGetTrafficLightNowStatusCallBack);
+            mRoadIdReqIndex = 0;
             reqValues.put("RoadId", mRoadIdArr[mRoadIdReqIndex]);
             RequestPool.getInstance().add("http://192.168.2.19:9090/transportservice/type/jason/action/GetRoadStatus.do",
-                    reqValues, mGetRoadStatusCallBack);
+                    reqValues, mAllGetRoadStatusCallBack);
         }
 
     }
