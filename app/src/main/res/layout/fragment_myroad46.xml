@@ -6,7 +6,7 @@
     android:paddingRight="100dp">
 
     <ListView
-        android:id="@+id/test46_lv_trafficlightinfoList"
+        android:id="@+id/test46_lv_trafficlightinfolist"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 

@@ -1,6 +1,7 @@
 package org.chengpx.test180501.fragment.test46;
 
 
+import android.app.AlertDialog;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.content.Context;
@@ -10,7 +11,13 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import org.chengpx.mylib.AppException;
 import org.chengpx.mylib.ViewPagerFragment;
@@ -29,16 +36,28 @@ import java.util.TimerTask;
  * <p>
  * create at 2018/5/2 11:15 by chengpx
  */
-public class MyRoad46Fragment extends ViewPagerFragment {
+public class MyRoad46Fragment extends ViewPagerFragment implements View.OnClickListener {
 
     private static String sTag = "org.chengpx.test180501.fragment.test46.MyRoad46Fragment";
 
-    private ListView test46_lv_trafficinfoList;
+    private ListView myroad46_lv_trafficinfolist;
     private Integer[] mTrafficLightIdArr = {
             1, 2, 3, 4, 5
     };
     private Integer[] mRoadIdArr = {
             1, 2, 3, 4, 5
+    };
+    private String[] mTrafficlightStatusArr = {
+            "Red", "Yellow", "Green"
+    };
+    private Integer[] mTrafficlightStatusImgResArr = {
+            R.drawable.shape_oval_red, R.drawable.shape_oval_yellow, R.drawable.shape_oval_green
+    };
+    private String[] mTrafficlightStatusDescArr = {
+            "红灯", "黄灯", "绿灯"
+    };
+    private String[] mTrafficlightTimeSearchKeyArr = {
+            "RedTime", "YellowTime", "GreenTime"
     };
     private Timer mTimer;
     private int mTrafficLightIdGetTrafficLightNowStatusReqIndex;
@@ -46,34 +65,36 @@ public class MyRoad46Fragment extends ViewPagerFragment {
     private int mRoadIdReqIndex;
     private Map<Integer, Map<String, Object>> mTrafficLightInfoMap;
     private MyRoad46Fragment mMyRoad46Fragment;
+    private MyAdapter mMyAdapter;
+    private AlertDialog mAlertDialog;
+    private EditText myroad_et_trafficklightconfigred;
+    private EditText myroad_et_trafficklightconfigyellow;
+    private EditText myroad_et_trafficklightconfiggreen;
 
     @Override
     protected void initListener() {
-        // Log.d(sTag, "MyRoad46Fragment initListener");
     }
 
     @Override
     protected View initView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        // Log.d(sTag, "MyRoad46Fragment initView");
         mMyRoad46Fragment = this;
         View view = inflater.inflate(R.layout.fragment_myroad46, container, false);
-        test46_lv_trafficinfoList = (ListView) view.findViewById(R.id.test46_lv_trafficlightinfoList);
+        myroad46_lv_trafficinfolist = (ListView) view.findViewById(R.id.test46_lv_trafficlightinfolist);
         return view;
     }
 
     @Override
     protected void onDie() {
-        // Log.d(sTag, "MyRoad46Fragment onDie");
     }
 
     @Override
     protected void main() {
-        // Log.d(sTag, "MyRoad46Fragment main");
+        mMyAdapter = new MyAdapter();
+        myroad46_lv_trafficinfolist.setAdapter(mMyAdapter);
     }
 
     @Override
     protected void initData() {
-        // Log.d(sTag, "MyRoad46Fragment initData");
         mTrafficLightInfoMap = new HashMap<>();
         for (Integer aMTrafficLightIdArr : mTrafficLightIdArr) {
             mTrafficLightInfoMap.put(aMTrafficLightIdArr, new HashMap<String, Object>());
@@ -89,13 +110,244 @@ public class MyRoad46Fragment extends ViewPagerFragment {
 
     @Override
     protected void onDims() {
-        // Log.d(sTag, "MyRoad46Fragment onDims");
         mTimer.cancel();
         mTimer = null;
+        mMyAdapter = null;
         mTrafficLightInfoMap = null;
         mTrafficLightIdGetTrafficLightNowStatusReqIndex = 0;
         mTrafficLightIdGetTrafficLightConfigActionReqIndex = 0;
         mRoadIdReqIndex = 0;
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case R.id.myroad_btn_horizontalcontrol:
+                showTrafficlightConfigDialog(v.getTag());
+                break;
+            case R.id.myroad_btn_verticalcontrol:
+                showTrafficlightConfigDialog(v.getTag());
+                break;
+            case R.id.myroad_imagebutton_trafficlightconfigquit:
+                mAlertDialog.dismiss();
+                mAlertDialog = null;
+                break;
+            case R.id.myroad_btn_trafficklightconfigconfirm:
+                configTrafficLight((int) v.getTag());
+                break;
+            case R.id.myroad_btn_trafficklightconfigcancel:
+                mAlertDialog.dismiss();
+                mAlertDialog = null;
+                break;
+        }
+    }
+
+    private void configTrafficLight(int trafficlightId) {
+        String strRedTime = myroad_et_trafficklightconfigred.getText().toString();
+        String strYellowTime = myroad_et_trafficklightconfigyellow.getText().toString();
+        String strGreenTime = myroad_et_trafficklightconfiggreen.getText().toString();
+        if (!verifyStr(strRedTime)) {
+            Toast.makeText(mFragmentActivity, "RedTime 非法", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (!verifyStr(strYellowTime)) {
+            Toast.makeText(mFragmentActivity, "YellowTime 非法", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (!verifyStr(strGreenTime)) {
+            Toast.makeText(mFragmentActivity, "GreenTime 非法", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        Map<String, Integer> reqValues = new HashMap<>();
+        reqValues.put("TrafficLightId", trafficlightId);
+        reqValues.put("RedTime", Integer.parseInt(strRedTime));
+        reqValues.put("YellowTime", Integer.parseInt(strYellowTime));
+        reqValues.put("GreenTime", Integer.parseInt(strGreenTime));
+        RequestPool.getInstance().add("http://192.168.2.19:9090/transportservice/type/jason/action/SetTrafficLightConfig.do",
+                reqValues, new SetTrafficLightConfigCallBack(Map.class, mMyRoad46Fragment, trafficlightId));
+        mAlertDialog.dismiss();
+        mAlertDialog = null;
+    }
+
+    private boolean verifyStr(String str) {
+        return !"".equals(str) && str.matches("^\\d{0,2}$") && 0 < Integer.parseInt(str) && Integer.parseInt(str) <= 30;
+    }
+
+    /**
+     * 弹出红绿灯配置窗口
+     *
+     * @param tag
+     */
+    private void showTrafficlightConfigDialog(Object tag) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(mFragmentActivity);
+        View view = LayoutInflater.from(mFragmentActivity).inflate(R.layout.dialog_trafficlightconfig, null);
+        builder.setView(view);
+        mAlertDialog = builder.create();
+        mAlertDialog.show();
+        ImageButton myroad_imagebutton_trafficlightconfigquit = view.findViewById(R.id.myroad_imagebutton_trafficlightconfigquit);
+        myroad_et_trafficklightconfigred = view.findViewById(R.id.myroad_et_trafficklightconfigred);
+        myroad_et_trafficklightconfigyellow = view.findViewById(R.id.myroad_et_trafficklightconfigyellow);
+        myroad_et_trafficklightconfiggreen = view.findViewById(R.id.myroad_et_trafficklightconfiggreen);
+        Button myroad_btn_trafficklightconfigconfirm = view.findViewById(R.id.myroad_btn_trafficklightconfigconfirm);
+        Button myroad_btn_trafficklightconfigcancel = view.findViewById(R.id.myroad_btn_trafficklightconfigcancel);
+        myroad_imagebutton_trafficlightconfigquit.setOnClickListener(this);
+        myroad_btn_trafficklightconfigconfirm.setOnClickListener(this);
+        myroad_btn_trafficklightconfigcancel.setOnClickListener(this);
+        myroad_btn_trafficklightconfigconfirm.setTag(tag);
+    }
+
+    private static class SetTrafficLightConfigCallBack extends HttpUtils.Callback<Map> {
+
+        private final MyRoad46Fragment mMyRoad46Fragment_inner;
+        private final int mTrafficlightId;
+
+        /**
+         * @param mapClass         结果数据封装体类型字节码
+         * @param myRoad46Fragment
+         * @param trafficlightId
+         */
+        SetTrafficLightConfigCallBack(Class<Map> mapClass, MyRoad46Fragment myRoad46Fragment, int trafficlightId) {
+            super(mapClass);
+            mMyRoad46Fragment_inner = myRoad46Fragment;
+            mTrafficlightId = trafficlightId;
+        }
+
+        @Override
+        protected void onSuccess(Map map) {
+            String result = (String) map.get("result");
+            if ("ok".equals(result)) {
+                Toast.makeText(mMyRoad46Fragment_inner.getActivity(), mTrafficlightId + " 号路口红绿灯配置信息成功", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(mMyRoad46Fragment_inner.getActivity(), "配置失败请重新提交", Toast.LENGTH_SHORT).show();
+            }
+        }
+
+    }
+
+    private static class ViewHolder {
+
+        private TextView myroad_tv_roadid;
+        private TextView myroad_tv_trafficlightinfo;
+        private TextView myroad_tv_horizontalstatus;
+        private TextView myroad_tv_horizontalimgstatus;
+        private TextView myroad_tv_verticalstatus;
+        private TextView myroad_tv_verticalimgstatus;
+        private Button myroad_btn_horizontalcontrol;
+        private Button myroad_btn_verticalcontrol;
+
+        ViewHolder(View view, MyRoad46Fragment myRoad46Fragment) {
+            myroad_tv_roadid = (TextView) view.findViewById(R.id.myroad_tv_roadid);
+            myroad_tv_trafficlightinfo = (TextView) view.findViewById(R.id.myroad_tv_trafficlightinfo);
+            myroad_tv_horizontalstatus = (TextView) view.findViewById(R.id.myroad_tv_horizontalstatus);
+            myroad_tv_horizontalimgstatus = (TextView) view.findViewById(R.id.myroad_tv_horizontalimgstatus);
+            myroad_tv_verticalstatus = (TextView) view.findViewById(R.id.myroad_tv_verticalstatus);
+            myroad_tv_verticalimgstatus = (TextView) view.findViewById(R.id.myroad_tv_verticalimgstatus);
+            myroad_btn_horizontalcontrol = (Button) view.findViewById(R.id.myroad_btn_horizontalcontrol);
+            myroad_btn_verticalcontrol = (Button) view.findViewById(R.id.myroad_btn_verticalcontrol);
+            myroad_btn_horizontalcontrol.setOnClickListener(myRoad46Fragment);
+            myroad_btn_verticalcontrol.setOnClickListener(myRoad46Fragment);
+        }
+
+        public static ViewHolder get(View view, MyRoad46Fragment myRoad46Fragment) {
+            Object tag = view.getTag();
+            if (tag == null) {
+                tag = new ViewHolder(view, myRoad46Fragment);
+                view.setTag(tag);
+            }
+            return (ViewHolder) tag;
+        }
+
+        public TextView getMyroad_tv_roadid() {
+            return myroad_tv_roadid;
+        }
+
+        public TextView getMyroad_tv_trafficlightinfo() {
+            return myroad_tv_trafficlightinfo;
+        }
+
+        public TextView getMyroad_tv_horizontalstatus() {
+            return myroad_tv_horizontalstatus;
+        }
+
+        public TextView getMyroad_tv_horizontalimgstatus() {
+            return myroad_tv_horizontalimgstatus;
+        }
+
+        public TextView getMyroad_tv_verticalstatus() {
+            return myroad_tv_verticalstatus;
+        }
+
+        public TextView getMyroad_tv_verticalimgstatus() {
+            return myroad_tv_verticalimgstatus;
+        }
+
+        public Button getMyroad_btn_horizontalcontrol() {
+            return myroad_btn_horizontalcontrol;
+        }
+
+        public Button getMyroad_btn_verticalcontrol() {
+            return myroad_btn_verticalcontrol;
+        }
+
+    }
+
+    private class MyAdapter extends BaseAdapter {
+
+        @Override
+        public int getCount() {
+            return mTrafficLightInfoMap == null ? 0 : mTrafficLightInfoMap.size();
+        }
+
+        @Override
+        public Map<String, Object> getItem(int position) {
+            return mTrafficLightInfoMap.get(mTrafficLightIdArr[position]);
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            ViewHolder viewHolder = null;
+            if (convertView == null) {
+                convertView = LayoutInflater.from(mFragmentActivity).inflate(R.layout.lv_test46_lv_trafficinfolist,
+                        myroad46_lv_trafficinfolist, false);
+                viewHolder = ViewHolder.get(convertView, mMyRoad46Fragment);
+            } else {
+                viewHolder = (ViewHolder) convertView.getTag();
+            }
+            Map<String, Object> item = getItem(position);
+            Log.d(sTag, item.toString());
+            viewHolder.getMyroad_tv_roadid().setText(item.get("RoadId") + "");
+            viewHolder.getMyroad_tv_trafficlightinfo().setText("红灯 " + item.get("RedTime")
+                    + " 黄灯 " + item.get("YellowTime")
+                    + " 绿灯 " + item.get("GreenTime"));
+            String status = (String) item.get("Status");
+            if (status != null) {
+                // int binarySearchStatus = Arrays.binarySearch(mTrafficlightStatusArr, status);
+                int binarySearchStatus = -1;
+                for (binarySearchStatus = 0; binarySearchStatus < mTrafficlightStatusArr.length; binarySearchStatus++) {
+                    if (status.equals(mTrafficlightStatusArr[binarySearchStatus])) {
+                        break;
+                    }
+                }
+                Log.d(sTag, "binarySearchStatus = " + binarySearchStatus);
+                if (binarySearchStatus > -1) {
+                    viewHolder.getMyroad_tv_horizontalstatus()
+                            .setText(mTrafficlightStatusDescArr[binarySearchStatus] + item.get(mTrafficlightTimeSearchKeyArr[binarySearchStatus]) + " 秒");
+                    viewHolder.getMyroad_tv_horizontalimgstatus().setBackgroundResource(mTrafficlightStatusImgResArr[binarySearchStatus]);
+                    viewHolder.getMyroad_tv_verticalstatus()
+                            .setText(mTrafficlightStatusDescArr[binarySearchStatus] + item.get(mTrafficlightTimeSearchKeyArr[binarySearchStatus]) + " 秒");
+                    viewHolder.getMyroad_tv_verticalimgstatus().setBackgroundResource(mTrafficlightStatusImgResArr[binarySearchStatus]);
+                }
+            }
+            viewHolder.getMyroad_btn_horizontalcontrol().setTag(mTrafficLightIdArr[position]);
+            viewHolder.getMyroad_btn_verticalcontrol().setTag(mTrafficLightIdArr[position]);
+            return convertView;
+        }
+
     }
 
     private static class GetRoadStatusCallBack extends HttpUtils.Callback<Map> {
@@ -118,9 +370,23 @@ public class MyRoad46Fragment extends ViewPagerFragment {
                 if (status > 3) {
                     notifyMsg(mMyRoad46Fragment_inner.getRoadIdArr()[mMyRoad46Fragment_inner.mRoadIdReqIndex] + " 号路口处于拥挤状态, 请选择合适的路线");
                 }
+                mMyRoad46Fragment_inner
+                        .getTrafficLightInfoMap()
+                        .get(mMyRoad46Fragment_inner.getTrafficLightIdArr()[mMyRoad46Fragment_inner.getRoadIdReqIndex()])
+                        .put("RoadStatus", status);
+                mMyRoad46Fragment_inner
+                        .getTrafficLightInfoMap()
+                        .get(mMyRoad46Fragment_inner.getTrafficLightIdArr()[mMyRoad46Fragment_inner.getRoadIdReqIndex()])
+                        .put("RoadId", mMyRoad46Fragment_inner.getRoadIdArr()[mMyRoad46Fragment_inner.getRoadIdReqIndex()]);
+                MyAdapter myAdapter = mMyRoad46Fragment_inner.getMyAdapter();
+                if (myAdapter != null) {
+                    myAdapter.notifyDataSetChanged();
+                }
             } catch (AppException e) {
                 e.printStackTrace();
             }
+            mMyRoad46Fragment_inner
+                    .setRoadIdReqIndex((mMyRoad46Fragment_inner.getRoadIdReqIndex() + 1) % mMyRoad46Fragment_inner.getRoadIdArr().length);
         }
 
         private void notifyMsg(String msg) {
@@ -164,7 +430,10 @@ public class MyRoad46Fragment extends ViewPagerFragment {
                 RequestPool.getInstance().add("http://192.168.2.19:9090/transportservice/type/jason/action/GetTrafficLightConfigAction.do",
                         reqValues, this);
             } else {
-                Log.d(sTag, objMap.toString());
+                MyAdapter myAdapter = mMyRoad46Fragment_inner.getMyAdapter();
+                if (myAdapter != null) {
+                    myAdapter.notifyDataSetChanged();
+                }
             }
         }
 
@@ -198,7 +467,10 @@ public class MyRoad46Fragment extends ViewPagerFragment {
                 RequestPool.getInstance().add("http://192.168.2.19:9090/transportservice/type/jason/action/GetTrafficLightNowStatus.do",
                         reqValues, this);
             } else {
-                Log.d(sTag, objMap.toString());
+                MyAdapter myAdapter = mMyRoad46Fragment_inner.getMyAdapter();
+                if (myAdapter != null) {
+                    myAdapter.notifyDataSetChanged();
+                }
             }
         }
 
@@ -221,8 +493,6 @@ public class MyRoad46Fragment extends ViewPagerFragment {
             reqValues.put("TrafficLightId", mTrafficLightIdArr[mTrafficLightIdGetTrafficLightNowStatusReqIndex]);
             RequestPool.getInstance().add("http://192.168.2.19:9090/transportservice/type/jason/action/GetTrafficLightNowStatus.do",
                     reqValues, mGetTrafficLightNowStatusCallBack);
-            reqValues.clear();
-            mRoadIdReqIndex = 0;
             reqValues.put("RoadId", mRoadIdArr[mRoadIdReqIndex]);
             RequestPool.getInstance().add("http://192.168.2.19:9090/transportservice/type/jason/action/GetRoadStatus.do",
                     reqValues, mGetRoadStatusCallBack);
@@ -264,6 +534,10 @@ public class MyRoad46Fragment extends ViewPagerFragment {
 
     public Integer[] getRoadIdArr() {
         return mRoadIdArr;
+    }
+
+    public MyAdapter getMyAdapter() {
+        return mMyAdapter;
     }
 
 }
