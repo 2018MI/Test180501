@@ -22,13 +22,10 @@ public abstract class ViewPagerFragment extends Fragment {
      */
     private boolean mIsVisibleToUser;
     /**
-     * 是否第一次展现
-     */
-    private boolean mIsFirstUsserVisibleHint = true;
-    /**
      * 是否已经调用 initData(), main()
      */
     private boolean mIsInit;
+    private boolean mIsCompleteOnCreateView;
     private String mTag = getClass().getName();
 
     @Override
@@ -40,15 +37,16 @@ public abstract class ViewPagerFragment extends Fragment {
     @Nullable
     @Override
     public final View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        mIsFirstUsserVisibleHint = false;
+        Log.d(mTag, "onCreateView, this: " + this);
         View view = initView(inflater, container, savedInstanceState);
         initListener();
-        if (getUserVisibleHint()) {
-            Log.d(mTag, "onCreateView initData main");
+        if (!mIsInit && getUserVisibleHint()) {
             initData();
             main();
             mIsInit = true;
+            Log.d(mTag, "onCreateView initData main: " + this);
         }
+        mIsCompleteOnCreateView = true;
         return view;
     }
 
@@ -59,8 +57,8 @@ public abstract class ViewPagerFragment extends Fragment {
     @Override
     public final void onDestroyView() {
         super.onDestroyView();
-        Log.d(mTag, "onDestroyView");
         onDie();
+        Log.d(mTag, "onDestroyView: " + this);
     }
 
     protected abstract void onDie();
@@ -73,26 +71,26 @@ public abstract class ViewPagerFragment extends Fragment {
     @Override
     public final void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
+        Log.d(mTag, "setUserVisibleHint setUserVisibleHint: " + isVisibleToUser + ", this: " + this);
         if (mIsVisibleToUser == isVisibleToUser) {
             return;
         }
-        if (isVisibleToUser) {
-            if (!mIsFirstUsserVisibleHint) {
-                Log.d(mTag, "setUserVisibleHint initData main");
+        mIsVisibleToUser = isVisibleToUser;
+        if (getUserVisibleHint()) {
+            if (mIsCompleteOnCreateView) {
                 initData();
                 main();
                 mIsInit = true;
+                Log.d(mTag, "setUserVisibleHint initData main: " + this);
             }
         } else {
-            Log.d(mTag, "setUserVisibleHint onDims");
             if (mIsInit) {
                 onDims();
-                mIsFirstUsserVisibleHint = true;
                 mIsVisibleToUser = false;
                 mIsInit = false;
+                Log.d(mTag, "setUserVisibleHint onDims: " + this);
             }
         }
-        mIsVisibleToUser = isVisibleToUser;
     }
 
     protected abstract void onDims();
@@ -100,5 +98,14 @@ public abstract class ViewPagerFragment extends Fragment {
     protected abstract void main();
 
     protected abstract void initData();
+
+    @Override
+    public String toString() {
+        return "ViewPagerFragment{" +
+                "mIsVisibleToUser=" + mIsVisibleToUser +
+                ", mIsInit=" + mIsInit +
+                ", mIsCompleteOnCreateView=" + mIsCompleteOnCreateView +
+                '}';
+    }
 
 }
