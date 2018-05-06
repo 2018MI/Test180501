@@ -30,10 +30,11 @@ public class MainSlidingMenuFragment extends Fragment implements AdapterView.OnI
 
     private String[] mItemStrArr = {
             "第4题编码实现车辆违章浏览功能1", "第12题编码实现车辆违章查看功能", "第13题编码实现路况查询模块",
-            "第30题编码实现车辆违章视频浏览播放功能", "第46题编码实现我的交通功能"
+            "第30题编码实现车辆违章视频浏览播放功能", "第46题编码实现我的交通功能", "第36题天气信息功能"
     };
     private BaseFragment[] mBaseFragmentArr = {
-            new Test4Fragment(), new Test12Fragment(), new Test13Fragment(), new Test30Fragment(), new Test46Fragment()
+            new Test4Fragment(), new Test12Fragment(), new Test13Fragment(), new Test30Fragment(), new Test46Fragment(),
+            new Test36Fragment()
     };
 
     @Nullable
